@@ -7,10 +7,12 @@ import { getPost } from './graphql/queries';
 export default function Post() {
   const [loading, updateLoading] = useState(true);
   const [post, updatePost] = useState(null);
-  const { id } = useParams()
+  const { id } = useParams();
+
   useEffect(() => {
-    fetchPost()
+    fetchPost();
   }, [])
+
   async function fetchPost() {
     try {
       const postData = await API.graphql({
@@ -26,6 +28,7 @@ export default function Post() {
       console.log('error: ', err)
     }
   }
+
   if (loading) return <h3>Loading...</h3>
   console.log('post: ', post)
   return (

@@ -9,6 +9,7 @@ import { css } from 'emotion';
 import { API, Storage, Auth } from 'aws-amplify';
 import { listPosts } from './graphql/queries';
 
+
 import Posts from './Posts';
 import Post from './Post';
 import Header from './Header';
@@ -19,16 +20,22 @@ function Router() {
   /* create a couple of pieces of initial state */
   const [showOverlay, updateOverlayVisibility] = useState(false);
   const [posts, updatePosts] = useState([]);
+  const [myPosts, updateMyPosts] = useState([]);
+
+  
+
 
   /* fetch posts when component loads */
   useEffect(() => {
       fetchPosts();
       checkUser(); // new function call
   }, []);
-  
+
   async function fetchPosts() {
     /* query the API, ask for 100 items */
+    
     let postData = await API.graphql({ query: listPosts, variables: { limit: 100 }});
+
     let postsArray = postData.data.listPosts.items;
     /* map over the image keys in the posts array, get signed image URLs for each image */
     postsArray = await Promise.all(postsArray.map(async post => {
@@ -47,8 +54,12 @@ function Router() {
   }
 
   async function setPostState(postsArray) {
+    const user = await Auth.currentAuthenticatedUser();
+    const myPostData = postsArray.filter(p => p.owner === user.username);
+    updateMyPosts(myPostData);
     updatePosts(postsArray);
   }
+
   return (
     <>
       <HashRouter>
@@ -62,6 +73,9 @@ function Router() {
               </Route>
               <Route path="/post/:id" >
                 <Post />
+              </Route>
+              <Route exact path="/myposts" >
+                <Posts posts={myPosts} />
               </Route>
             </Switch>
           </div>

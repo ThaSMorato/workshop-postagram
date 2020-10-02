@@ -9,8 +9,19 @@ export const getPost = /* GraphQL */ `
       location
       description
       image
+      owner
       createdAt
       updatedAt
+      comments {
+        items {
+          id
+          message
+          owner
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
     }
   }
 `;
@@ -27,6 +38,39 @@ export const listPosts = /* GraphQL */ `
         location
         description
         image
+        owner
+        createdAt
+        updatedAt
+        comments {
+          nextToken
+        }
+      }
+      nextToken
+    }
+  }
+`;
+export const getComment = /* GraphQL */ `
+  query GetComment($id: ID!) {
+    getComment(id: $id) {
+      id
+      message
+      owner
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listComments = /* GraphQL */ `
+  query ListComments(
+    $filter: ModelCommentFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listComments(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        message
+        owner
         createdAt
         updatedAt
       }
